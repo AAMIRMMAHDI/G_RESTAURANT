@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل گارسون</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        body { background: #f5f7fa; padding: 2rem; }
+        .order-card { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <h2>سفارشات آماده تحویل</h2>
+    <p>فروش امروز: {{ delivered_today }} تومان</p>
+    {% for order in orders %}
+    <div class="order-card">
+        <strong>میز {{ order.table_number }} - سفارش #{{ order.id }}</strong>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            <button type="submit" class="btn btn-success">تحویل داده شد</button>
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>

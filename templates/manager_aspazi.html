@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل آشپز</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+        :root { --primary: #F72585; --success: #4CAF50; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        body { background: #f5f7fa; padding: 2rem; }
+        .order-card { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    <h2>سفارشات تأیید شده</h2>
+    {% for order in orders %}
+    <div class="order-card">
+        <strong>سفارش #{{ order.id }} - میز {{ order.table_number }}</strong>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            {% if order.status == 'confirmed' %}
+                <button name="action" value="start" class="btn btn-primary">شروع پخت</button>
+            {% elif order.status == 'preparing' %}
+                <button name="action" value="finish" class="btn btn-success">اتمام پخت</button>
+            {% endif %}
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت - تایید سفارشات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+        :root { --primary: #4361EE; --dark: #2B2D42; --light: #F8F9FA; --shadow: 0 10px 30px rgba(0,0,0,0.08); --radius: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        body { background: #F0F2F5; display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: linear-gradient(135deg, var(--dark), #1A1C2E); color: white; padding: 2rem; }
+        .main-content { flex: 1; padding: 2rem; }
+        .orders-table { width: 100%; border-collapse: collapse; }
+        .orders-table th, .orders-table td { padding: 1rem; border-bottom: 1px solid #eee; text-align: right; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">منو</div>
+    <div class="main-content">
+        <h2>سفارشات در انتظار تأیید</h2>
+        <table class="orders-table">
+            <thead>
+                <tr><th>شناسه</th><th>مشتری</th><th>میز</th><th>جمع</th><th>عملیات</th></tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.get_full_name }}</td>
+                    <td>{{ order.table_number }}</td>
+                    <td>{{ order.total_price }}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <button type="submit" class="btn btn-success btn-sm">تأیید</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

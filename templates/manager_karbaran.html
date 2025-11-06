@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت کاربران</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        body { background: #f5f7fa; padding: 2rem; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 1rem; text-align: right; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <h2>مدیریت کارمندان</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ذخیره</button>
+    </form>
+
+    <table>
+        <tr><th>نام</th><th>موبایل</th><th>نقش</th><th>عملیات</th></tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.get_full_name }}</td>
+            <td>{{ user.mobile }}</td>
+            <td>{{ user.get_role_display }}</td>
+            <td>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete" value="1">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <button type="submit">حذف</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

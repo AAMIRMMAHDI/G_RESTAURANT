@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به رستوران مدرن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+        :root { --primary: #FF6B6B; --primary-dark: #EE5A52; --secondary: #4ECDC4; --success: #51CF66; --danger: #FF6B6B; --dark: #292F36; --light: #F7F7F7; --transition: all 0.4s; --shadow: 0 10px 30px rgba(0,0,0,0.08); --radius: 16px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
+        body { background-color: var(--light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+        .auth-container { max-width: 450px; background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        .auth-header { background: linear-gradient(135deg, var(--dark), #1A1C2E); color: white; padding: 2rem; text-align: center; }
+        .logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1rem; }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
+        .auth-title { font-size: 1.5rem; font-weight: 700; }
+        .auth-body { padding: 2rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-control { width: 100%; padding: 1rem 1.2rem; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: var(--transition); }
+        .form-control:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2); }
+        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 1.5rem; }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3); }
+        .code-inputs { display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 1rem; }
+        .code-input { width: 60px; height: 60px; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 1.5rem; font-weight: 700; }
+        .code-input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2); }
+        .message { padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.95rem; }
+        .message.success { background: rgba(81, 207, 102, 0.15); color: var(--success); border: 1px solid rgba(81, 207, 102, 0.3); }
+        .message.error { background: rgba(255, 107, 107, 0.15); color: var(--danger); border: 1px solid rgba(255, 107, 107, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-utensils"></i></div>
+                <div class="logo-text">رستوران مدرن</div>
+            </div>
+            <h2 class="auth-title">ورود / ثبت نام</h2>
+        </div>
+        <div class="auth-body">
+            <!-- نمایش پیام‌های فلش -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                {% if step == 1 %}
+                    <div class="form-group">
+                        <label>شماره موبایل</label>
+                        {{ form.mobile }}
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> ارسال کد
+                    </button>
+                {% elif step == 2 %}
+                    <div class="form-group">
+                        <label>کد تأیید (4 رقمی)</label>
+                        <div class="code-inputs">
+                            <input type="text" maxlength="1" class="code-input" autofocus>
+                            <input type="text" maxlength="1" class="code-input">
+                            <input type="text" maxlength="1" class="code-input">
+                            <input type="text" maxlength="1" class="code-input">
+                        </div>
+                        <input type="hidden" name="code" id="fullCode">
+                        <small style="color: #666; display: block; margin-top: 0.5rem;">
+                            کد به شماره {{ request.session.mobile }} ارسال شد.
+                        </small>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-check"></i> تأیید کد
+                    </button>
+                {% elif step == 3 %}
+                    <div class="form-group">
+                        <label>نام</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label>نام خانوادگی</label>
+                        {{ form.last_name }}
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-user-plus"></i> تکمیل ثبت نام
+                    </button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.code-input');
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', () => {
+                    if (input.value.length === 1 && index < 3) {
+                        inputs[index + 1].focus();
+                    }
+                    document.getElementById('fullCode').value = Array.from(inputs).map(i => i.value).join('');
+                });
+                input.addEventListener('keydown', e => {
+                    if (e.key === 'Backspace' && !input.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
