@@ -1,4 +1,4 @@
-# views.py
+# user/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib import messages
@@ -37,7 +37,10 @@ def login_view(request):
                 code = form.cleaned_data['code']
                 otp = OTPCode.objects.filter(mobile=mobile, code=code).first()
                 if otp and otp.is_valid():
-                    user, created = User.objects.get_or_create(mobile=mobile)
+                    user, created = User.objects.get_or_create(
+                        mobile=mobile,
+                        defaults={'username': mobile}  # مهم!
+                    )
                     if created or not user.first_name:
                         request.session['login_step'] = 3
                         return redirect('user:login')
@@ -86,7 +89,9 @@ def manage_users(request):
         else:
             form = UserManagementForm(request.POST)
             if form.is_valid():
-                form.save()
+                user = form.save(commit=False)
+                user.username = user.mobile  # مهم!
+                user.save()
                 messages.success(request, 'کاربر ذخیره شد.')
 
     return render(request, 'manager_karbaran.html', {

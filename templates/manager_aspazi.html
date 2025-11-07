@@ -3,31 +3,942 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل آشپز</title>
+    <title>پنل آشپز - سفارشات تایید شده</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* فونت‌ها و متغیرها */
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
-        :root { --primary: #F72585; --success: #4CAF50; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
-        body { background: #f5f7fa; padding: 2rem; }
-        .order-card { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
+        :root {
+            --primary: #F72585;
+            --primary-dark: #E11575;
+            --secondary: #7209B7;
+            --accent: #4CC9F0;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --dark: #2B2D42;
+            --light: #F8F9FA;
+            --gray: #8D99AE;
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        /* هدر */
+        .header {
+            background: linear-gradient(135deg, var(--dark), #1A1C2E);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #3A8FB7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* محتوای اصلی */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .page-subtitle {
+            color: var(--gray);
+            margin-top: 0.5rem;
+        }
+        
+        .notification-bell {
+            position: relative;
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .notification-bell:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        
+        /* کارت‌های وضعیت */
+        .status-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .status-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .status-icon.pending {
+            background: linear-gradient(135deg, var(--warning), #F57C00);
+        }
+        
+        .status-icon.preparing {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .status-icon.ready {
+            background: linear-gradient(135deg, var(--success), #388E3C);
+        }
+        
+        .status-info {
+            flex: 1;
+        }
+        
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        .status-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* فیلترها */
+        .filters-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .filter-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        
+        .filter-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* کارت‌های سفارش */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .order-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-id {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        .order-time {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .order-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-pending {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-preparing {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-ready {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+        
+        .order-body {
+            padding: 1.5rem;
+        }
+        
+        .order-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .info-value {
+            font-weight: 600;
+        }
+        
+        .order-items {
+            margin-bottom: 1.5rem;
+        }
+        
+        .items-title {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+        }
+        
+        .item-list {
+            list-style: none;
+        }
+        
+        .item-list li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            flex: 1;
+        }
+        
+        .item-quantity {
+            background: #f0f0f0;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .item-notes {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+            padding-right: 1rem;
+        }
+        
+        .order-footer {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-total {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 37, 133, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #388E3C);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #F57C00);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        
+        .urgent-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--danger);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        /* نوتیفیکیشن */
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            transform: translateX(-150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 350px;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #3A8FB7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .notification-message {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .close-notification {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .close-notification:hover {
+            color: var(--dark);
+        }
+        
+        /* رسپانسیو */
+        @media (max-width: 992px) {
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .status-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .order-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* انیمیشن‌ها */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body>
-    <h2>سفارشات تأیید شده</h2>
-    {% for order in orders %}
-    <div class="order-card">
-        <strong>سفارش #{{ order.id }} - میز {{ order.table_number }}</strong>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="order_id" value="{{ order.id }}">
-            {% if order.status == 'confirmed' %}
-                <button name="action" value="start" class="btn btn-primary">شروع پخت</button>
-            {% elif order.status == 'preparing' %}
-                <button name="action" value="finish" class="btn btn-success">اتمام پخت</button>
-            {% endif %}
-        </form>
+    <!-- هدر -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="logo-text">پنل آشپز</div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">آش</div>
+                <div class="user-details">
+                    <div class="user-name">رضا آشپز</div>
+                    <div class="user-role">سرآشپز</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوای اصلی -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">سفارشات تایید شده</h1>
+                <p class="page-subtitle">مدیریت و پیگیری سفارشات تایید شده توسط مدیریت</p>
+            </div>
+            <div class="notification-bell">
+                <i class="fas fa-bell"></i>
+                <div class="notification-dot"></div>
+            </div>
+        </div>
+
+        <!-- کارت‌های وضعیت -->
+        <div class="status-cards">
+            <div class="status-card fade-in">
+                <div class="status-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="pendingCount">۰</div>
+                    <div class="status-label">در انتظار پخت</div>
+                </div>
+            </div>
+            
+            <div class="status-card fade-in">
+                <div class="status-icon preparing">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="preparingCount">۰</div>
+                    <div class="status-label">در حال پخت</div>
+                </div>
+            </div>
+            
+            <div class="status-card fade-in">
+                <div class="status-icon ready">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="readyCount">۰</div>
+                    <div class="status-label">آماده سرو</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- فیلترها -->
+        <div class="filters-section fade-in">
+            <div class="filter-title">فیلتر بر اساس وضعیت:</div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">همه</button>
+                <button class="filter-btn" data-filter="pending">در انتظار پخت</button>
+                <button class="filter-btn" data-filter="preparing">در حال پخت</button>
+                <button class="filter-btn" data-filter="ready">آماده سرو</button>
+            </div>
+        </div>
+
+        <!-- کارت‌های سفارش -->
+        <div class="orders-grid" id="ordersGrid">
+            <!-- کارت‌های سفارش با JavaScript پر می‌شوند -->
+        </div>
     </div>
-    {% endfor %}
+
+    <!-- نوتیفیکیشن -->
+    <div class="notification-toast" id="notificationToast">
+        <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title" id="toastTitle">سفارش جدید</div>
+            <div class="notification-message" id="toastMessage">یک سفارش جدید برای میز ۵ ثبت شد</div>
+        </div>
+        <button class="close-notification" id="closeToast">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        // المنت‌های DOM
+        const ordersGrid = document.getElementById('ordersGrid');
+        const pendingCount = document.getElementById('pendingCount');
+        const preparingCount = document.getElementById('preparingCount');
+        const readyCount = document.getElementById('readyCount');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const notificationToast = document.getElementById('notificationToast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+        const closeToast = document.getElementById('closeToast');
+
+        let currentFilter = 'all';
+        let orders = [];
+
+        // دریافت سفارشات از API
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/api/chef/orders/');
+                const data = await response.json();
+                orders = data.orders;
+                renderOrders();
+            } catch (error) {
+                console.error('خطا در دریافت سفارشات:', error);
+                showNotification('خطا', 'دریافت سفارشات با مشکل مواجه شد.');
+            }
+        }
+
+        // نمایش سفارشات
+        function renderOrders() {
+            ordersGrid.innerHTML = '';
+            
+            // فیلتر کردن سفارشات
+            const filteredOrders = currentFilter === 'all' 
+                ? orders 
+                : orders.filter(order => order.status === currentFilter);
+            
+            // شمارش سفارشات بر اساس وضعیت
+            const pendingOrders = orders.filter(order => order.status === 'pending').length;
+            const preparingOrders = orders.filter(order => order.status === 'preparing').length;
+            const readyOrders = orders.filter(order => order.status === 'ready').length;
+            
+            // به‌روزرسانی کارت‌های وضعیت
+            pendingCount.textContent = pendingOrders;
+            preparingCount.textContent = preparingOrders;
+            readyCount.textContent = readyOrders;
+            
+            // نمایش سفارشات
+            filteredOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card fade-in';
+                
+                // تعیین وضعیت
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(order.status) {
+                    case 'pending':
+                        statusText = 'در انتظار پخت';
+                        statusClass = 'badge-pending';
+                        break;
+                    case 'preparing':
+                        statusText = 'در حال پخت';
+                        statusClass = 'badge-preparing';
+                        break;
+                    case 'ready':
+                        statusText = 'آماده سرو';
+                        statusClass = 'badge-ready';
+                        break;
+                }
+                
+                orderCard.innerHTML = `
+                    ${order.urgent ? '<div class="urgent-badge">فوری</div>' : ''}
+                    <div class="order-header">
+                        <div class="order-id">${order.id}</div>
+                        <div class="order-time">${order.time}</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-info">
+                            <div class="info-item">
+                                <span class="info-label">مشتری</span>
+                                <span class="info-value">${order.customer}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">میز</span>
+                                <span class="info-value">${order.table}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">وضعیت</span>
+                                <span class="order-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">مبلغ</span>
+                                <span class="info-value">${order.total.toLocaleString()} تومان</span>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            <div class="items-title">محصولات سفارش:</div>
+                            <ul class="item-list">
+                                ${order.items.map(item => `
+                                    <li>
+                                        <span class="item-name">${item.name}</span>
+                                        <span class="item-quantity">${item.quantity}</span>
+                                    </li>
+                                    ${item.notes ? `<div class="item-notes">${item.notes}</div>` : ''}
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="order-footer">
+                        <div class="order-total">${order.total.toLocaleString()} تومان</div>
+                        <div class="action-buttons">
+                            ${order.status === 'pending' ? `
+                                <button class="btn btn-primary" onclick="startCooking('${order.id}')">
+                                    <i class="fas fa-play"></i>
+                                    شروع پخت
+                                </button>
+                            ` : ''}
+                            ${order.status === 'preparing' ? `
+                                <button class="btn btn-success" onclick="markAsReady('${order.id}')">
+                                    <i class="fas fa-check"></i>
+                                    اتمام پخت
+                                </button>
+                            ` : ''}
+                            ${order.status === 'ready' ? `
+                                <button class="btn btn-warning" onclick="markAsServed('${order.id}')">
+                                    <i class="fas fa-utensils"></i>
+                                    تحویل داده شد
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                ordersGrid.appendChild(orderCard);
+            });
+        }
+
+        // شروع پخت (ارسال به API)
+        async function startCooking(orderId) {
+            try {
+                const response = await fetch(`/api/chef/start/${orderId.replace('ORD-', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    await fetchOrders();  // بروزرسانی لیست
+                    showNotification('شروع پخت', `سفارش ${orderId} شروع شد.`);
+                } else {
+                    showNotification('خطا', 'عملیات ناموفق بود.');
+                }
+            } catch (error) {
+                console.error('خطا:', error);
+                showNotification('خطا', 'ارتباط با سرور برقرار نشد.');
+            }
+        }
+
+        // علامت‌گذاری به عنوان آماده (ارسال به API)
+        async function markAsReady(orderId) {
+            try {
+                const response = await fetch(`/api/chef/finish/${orderId.replace('ORD-', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    await fetchOrders();  // بروزرسانی لیست
+                    showNotification('آماده سرو', `سفارش ${orderId} آماده شد.`);
+                } else {
+                    showNotification('خطا', 'عملیات ناموفق بود.');
+                }
+            } catch (error) {
+                console.error('خطا:', error);
+                showNotification('خطا', 'ارتباط با سرور برقرار نشد.');
+            }
+        }
+
+        // علامت‌گذاری به عنوان تحویل داده شده (اگر نیاز باشد، اما در پنل آشپز ممکن نیست)
+        async function markAsServed(orderId) {
+            // این تابع ممکن است در پنل آشپز نیاز نباشد، اما اگر هست می‌توانید حذف کنید یا پیاده‌سازی کنید
+            showNotification('خطا', 'این عملیات در پنل آشپز مجاز نیست.');
+        }
+
+        // نمایش نوتیفیکیشن
+        function showNotification(title, message) {
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            notificationToast.classList.add('show');
+            
+            // پنهان کردن خودکار نوتیفیکیشن پس از 5 ثانیه
+            setTimeout(() => {
+                notificationToast.classList.remove('show');
+            }, 5000);
+        }
+
+        // بستن نوتیفیکیشن
+        closeToast.addEventListener('click', () => {
+            notificationToast.classList.remove('show');
+        });
+
+        // دریافت CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // بارگذاری اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchOrders();
+            
+            // اضافه کردن event listener برای فیلترها
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderOrders();
+                });
+            });
+            
+            // شبیه‌سازی کلیک روی زنگ اطلاع‌رسانی (می‌توانید برای رفرش استفاده کنید)
+            document.querySelector('.notification-bell').addEventListener('click', () => {
+                fetchOrders();
+            });
+
+            // بروزرسانی خودکار هر 30 ثانیه
+            setInterval(fetchOrders, 30000);
+        });
+    </script>
 </body>
 </html>

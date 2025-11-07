@@ -1,3 +1,4 @@
+# user/admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User, OTPCode
@@ -5,9 +6,9 @@ from .models import User, OTPCode
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('mobile', 'get_full_name', 'role', 'status', 'hire_date')
-    list_filter = ('role', 'status', 'is_active')
-    search_fields = ('mobile', 'first_name', 'last_name', 'national_code')
+    list_display = ('mobile', 'get_full_name', 'role', 'status', 'hire_date', 'date_joined')
+    list_filter = ('role', 'status', 'is_active', 'date_joined')
+    search_fields = ('mobile', 'first_name', 'last_name')
     ordering = ('-date_joined',)
 
     fieldsets = (
@@ -19,6 +20,7 @@ class UserAdmin(BaseUserAdmin):
 
     add_fieldsets = (
         (None, {
+            'classes': ('wide',),
             'fields': ('mobile', 'first_name', 'last_name', 'role', 'password1', 'password2'),
         }),
     )

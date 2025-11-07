@@ -7,26 +7,61 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
-        :root { --primary: #FF6B6B; --primary-dark: #EE5A52; --secondary: #4ECDC4; --success: #51CF66; --danger: #FF6B6B; --dark: #292F36; --light: #F7F7F7; --transition: all 0.4s; --shadow: 0 10px 30px rgba(0,0,0,0.08); --radius: 16px; }
+        
+        :root {
+            --primary: #FF6B6B;
+            --primary-dark: #EE5A52;
+            --secondary: #4ECDC4;
+            --accent: #FFD166;
+            --dark: #292F36;
+            --light: #F7F7F7;
+            --gray: #8A8A8A;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --radius: 16px;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
-        body { background-color: var(--light); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
-        .auth-container { max-width: 450px; background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+        body { background-color: var(--light); color: var(--dark); overflow-x: hidden; line-height: 1.6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+        .auth-container { width: 100%; max-width: 450px; background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; position: relative; }
         .auth-header { background: linear-gradient(135deg, var(--dark), #1A1C2E); color: white; padding: 2rem; text-align: center; }
         .logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1rem; }
         .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; }
-        .auth-title { font-size: 1.5rem; font-weight: 700; }
+        .logo-text { font-weight: 800; font-size: 1.8rem; }
+        .auth-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .auth-subtitle { opacity: 0.8; font-size: 0.95rem; }
         .auth-body { padding: 2rem; }
+        .steps { display: flex; justify-content: center; margin-bottom: 2rem; position: relative; }
+        .steps:before { content: ''; position: absolute; top: 15px; right: 0; left: 0; height: 2px; background: #e0e0e0; z-index: 1; }
+        .step { width: 30px; height: 30px; border-radius: 50%; background: white; border: 2px solid #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--gray); position: relative; z-index: 2; transition: var(--transition); }
+        .step.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .step.completed { background: var(--secondary); border-color: var(--secondary); color: white; }
+        .step-line { flex: 1; height: 2px; background: #e0e0e0; margin: 0 5px; position: relative; top: 15px; }
+        .step-line.active { background: var(--primary); }
+        .step-container { display: flex; width: 300%; transition: var(--transition); }
+        .step-panel { width: 33.333%; padding: 0 1rem; flex-shrink: 0; }
         .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark); }
         .form-control { width: 100%; padding: 1rem 1.2rem; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: var(--transition); }
         .form-control:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2); }
-        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 1.5rem; }
+        .input-with-icon { position: relative; }
+        .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray); }
+        .input-with-icon .form-control { padding-left: 3rem; }
+        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 1.5rem; }
         .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3); }
         .code-inputs { display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 1rem; }
-        .code-input { width: 60px; height: 60px; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 1.5rem; font-weight: 700; }
+        .code-input { width: 60px; height: 60px; border: 2px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 1.5rem; font-weight: 700; transition: var(--transition); }
         .code-input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2); }
+        .timer { text-align: center; margin-top: 1rem; color: var(--gray); }
+        .resend-btn { background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; }
+        .back-btn { background: none; border: none; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 1rem; font-weight: 600; }
         .message { padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.95rem; }
-        .message.success { background: rgba(81, 207, 102, 0.15); color: var(--success); border: 1px solid rgba(81, 207, 102, 0.3); }
-        .message.error { background: rgba(255, 107, 107, 0.15); color: var(--danger); border: 1px solid rgba(255, 107, 107, 0.3); }
+        .message.success { background: rgba(81, 207, 102, 0.15); color: #51CF66; border: 1px solid rgba(81, 207, 102, 0.3); }
+        .message.error { background: rgba(255, 107, 107, 0.15); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.3); }
+        .name-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @media (max-width: 480px) { .name-inputs { grid-template-columns: 1fr; } .code-input { width: 50px; height: 50px; } }
     </style>
 </head>
 <body>
@@ -36,10 +71,19 @@
                 <div class="logo-icon"><i class="fas fa-utensils"></i></div>
                 <div class="logo-text">رستوران مدرن</div>
             </div>
-            <h2 class="auth-title">ورود / ثبت نام</h2>
+            <h1 class="auth-title">ورود / ثبت نام</h1>
+            <p class="auth-subtitle">برای دسترسی به خدمات رستوران وارد شوید</p>
         </div>
+        
         <div class="auth-body">
-            <!-- نمایش پیام‌های فلش -->
+            <div class="steps">
+                <div class="step {% if step == 1 %}active{% elif step > 1 %}completed{% endif %}">1</div>
+                <div class="step-line {% if step > 1 %}active{% endif %}"></div>
+                <div class="step {% if step == 2 %}active{% elif step > 2 %}completed{% endif %}">2</div>
+                <div class="step-line {% if step > 2 %}active{% endif %}"></div>
+                <div class="step {% if step == 3 %}active{% endif %}">3</div>
+            </div>
+
             {% if messages %}
                 {% for message in messages %}
                     <div class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
@@ -50,63 +94,81 @@
 
             <form method="post">
                 {% csrf_token %}
-                {% if step == 1 %}
-                    <div class="form-group">
-                        <label>شماره موبایل</label>
-                        {{ form.mobile }}
-                    </div>
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-paper-plane"></i> ارسال کد
-                    </button>
-                {% elif step == 2 %}
-                    <div class="form-group">
-                        <label>کد تأیید (4 رقمی)</label>
-                        <div class="code-inputs">
-                            <input type="text" maxlength="1" class="code-input" autofocus>
-                            <input type="text" maxlength="1" class="code-input">
-                            <input type="text" maxlength="1" class="code-input">
-                            <input type="text" maxlength="1" class="code-input">
+                <div class="step-container" id="stepContainer">
+                    <!-- مرحله 1 -->
+                    <div class="step-panel fade-in" {% if step != 1 %}style="display: none;"{% endif %}>
+                        <div class="form-group">
+                            <label for="phone" class="form-label">شماره تلفن همراه</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone input-icon"></i>
+                                {{ form.mobile }}
+                            </div>
                         </div>
-                        <input type="hidden" name="code" id="fullCode">
-                        <small style="color: #666; display: block; margin-top: 0.5rem;">
-                            کد به شماره {{ request.session.mobile }} ارسال شد.
-                        </small>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i> ارسال کد تأیید
+                        </button>
                     </div>
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-check"></i> تأیید کد
-                    </button>
-                {% elif step == 3 %}
-                    <div class="form-group">
-                        <label>نام</label>
-                        {{ form.first_name }}
+
+                    <!-- مرحله 2 -->
+                    <div class="step-panel" {% if step != 2 %}style="display: none;"{% endif %}>
+                        <button type="button" class="back-btn" onclick="history.back()">
+                            <i class="fas fa-arrow-right"></i> بازگشت
+                        </button>
+                        <div class="form-group">
+                            <label class="form-label">کد تأیید ارسال شده به شماره <span id="phoneNumberDisplay">{{ request.session.mobile }}</span></label>
+                            <div class="code-inputs">
+                                <input type="text" class="code-input" maxlength="1" data-index="0" autofocus>
+                                <input type="text" class="code-input" maxlength="1" data-index="1">
+                                <input type="text" class="code-input" maxlength="1" data-index="2">
+                                <input type="text" class="code-input" maxlength="1" data-index="3">
+                            </div>
+                            <input type="hidden" name="code" id="fullCode">
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-check"></i> تأیید کد
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label>نام خانوادگی</label>
-                        {{ form.last_name }}
+
+                    <!-- مرحله 3 -->
+                    <div class="step-panel" {% if step != 3 %}style="display: none;"{% endif %}>
+                        <button type="button" class="back-btn" onclick="history.back()">
+                            <i class="fas fa-arrow-right"></i> بازگشت
+                        </button>
+                        <div class="form-group">
+                            <label class="form-label">اطلاعات شخصی</label>
+                            <div class="name-inputs">
+                                <div>{{ form.first_name }}</div>
+                                <div>{{ form.last_name }}</div>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-user-check"></i> تکمیل ثبت نام
+                        </button>
                     </div>
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-user-plus"></i> تکمیل ثبت نام
-                    </button>
-                {% endif %}
+                </div>
             </form>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputs = document.querySelectorAll('.code-input');
-            inputs.forEach((input, index) => {
-                input.addEventListener('input', () => {
-                    if (input.value.length === 1 && index < 3) {
-                        inputs[index + 1].focus();
-                    }
-                    document.getElementById('fullCode').value = Array.from(inputs).map(i => i.value).join('');
-                });
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Backspace' && !input.value && index > 0) {
-                        inputs[index - 1].focus();
-                    }
-                });
+        const inputs = document.querySelectorAll('.code-input');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (!/^\d*$/.test(e.target.value)) e.target.value = '';
+                if (e.target.value && index < 3) inputs[index + 1].focus();
+                document.getElementById('fullCode').value = Array.from(inputs).map(i => i.value).join('');
+            });
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !input.value && index > 0) inputs[index - 1].focus();
+            });
+            input.addEventListener('paste50', e => {
+                e.preventDefault();
+                const paste = e.clipboardData.getData('text');
+                if (/^\d{4}$/.test(paste)) {
+                    paste.split('').forEach((char, i) => { if (inputs[i]) inputs[i].value = char; });
+                    inputs[3].focus();
+                    document.getElementById('fullCode').value = paste;
+                }
             });
         });
     </script>

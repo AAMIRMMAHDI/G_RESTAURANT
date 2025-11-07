@@ -6,43 +6,1082 @@
     <title>پنل مدیریت - تایید سفارشات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* فونت‌ها و متغیرها */
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
-        :root { --primary: #4361EE; --dark: #2B2D42; --light: #F8F9FA; --shadow: 0 10px 30px rgba(0,0,0,0.08); --radius: 12px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
-        body { background: #F0F2F5; display: flex; min-height: 100vh; }
-        .sidebar { width: 280px; background: linear-gradient(135deg, var(--dark), #1A1C2E); color: white; padding: 2rem; }
-        .main-content { flex: 1; padding: 2rem; }
-        .orders-table { width: 100%; border-collapse: collapse; }
-        .orders-table th, .orders-table td { padding: 1rem; border-bottom: 1px solid #eee; text-align: right; }
-        .btn-sm { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        
+        :root {
+            --primary: #4361EE;
+            --primary-dark: #3A56D4;
+            --secondary: #7209B7;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F72585;
+            --dark: #2B2D42;
+            --light: #F8F9FA;
+            --gray: #8D99AE;
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        body {
+            background-color: #F0F2F5;
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* سایدبار */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--dark), #1A1C2E);
+            color: white;
+            padding: 2rem 1.5rem;
+            transition: var(--transition);
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.4rem;
+        }
+        
+        .nav-links {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.8rem;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.9rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        /* محتوای اصلی */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* کارت‌های آماری */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, var(--warning), #F57C00);
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, var(--success), #388E3C);
+        }
+        
+        .stat-icon.danger {
+            background: linear-gradient(135deg, var(--danger), #C2185B);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* جدول سفارشات */
+        .orders-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .orders-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .orders-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .customer-name {
+            font-weight: 600;
+        }
+        
+        .table-number {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .order-items {
+            max-width: 200px;
+        }
+        
+        .item-list {
+            list-style: none;
+        }
+        
+        .item-list li {
+            margin-bottom: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .item-name {
+            flex: 1;
+        }
+        
+        .item-quantity {
+            color: var(--gray);
+            margin-right: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-confirmed {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+        
+        .status-preparing {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .status-ready {
+            background: rgba(156, 39, 176, 0.1);
+            color: #9C27B0;
+        }
+        
+        .status-completed {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #388E3C;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #C2185B;
+            transform: translateY(-2px);
+        }
+        
+        /* جزئیات سفارش */
+        .order-details {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .details-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+        }
+        
+        .order-items-details {
+            margin-bottom: 2rem;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .items-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .items-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .total-row {
+            font-weight: 700;
+            background: #f8f9fa;
+        }
+        
+        .actions-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* رسپانسیو */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                padding: 1.5rem 0.8rem;
+            }
+            
+            .logo-text, .nav-text {
+                display: none;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
+            
+            .nav-link {
+                justify-content: center;
+                padding: 0.9rem 0.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .logo-text, .nav-text {
+                display: block;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                gap: 0.5rem;
+            }
+            
+            .nav-item {
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* انیمیشن‌ها */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">منو</div>
-    <div class="main-content">
-        <h2>سفارشات در انتظار تأیید</h2>
-        <table class="orders-table">
-            <thead>
-                <tr><th>شناسه</th><th>مشتری</th><th>میز</th><th>جمع</th><th>عملیات</th></tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.user.get_full_name }}</td>
-                    <td>{{ order.table_number }}</td>
-                    <td>{{ order.total_price }}</td>
-                    <td>
-                        <form method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="order_id" value="{{ order.id }}">
-                            <button type="submit" class="btn btn-success btn-sm">تأیید</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- سایدبار -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <div class="logo-text">پنل مدیریت</div>
+        </div>
+        
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">داشبورد</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="nav-text">سفارشات</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-utensils"></i>
+                    <span class="nav-text">منو</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">مشتریان</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="nav-text">گزارشات</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">تنظیمات</span>
+                </a>
+            </li>
+        </ul>
     </div>
+
+    <!-- محتوای اصلی -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">تایید سفارشات</h1>
+            <div class="user-info">
+                <div class="user-avatar">مدیر</div>
+                <div class="user-details">
+                    <div class="user-name">محمد رضایی</div>
+                    <div class="user-role">مدیر رستوران</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- کارت‌های آماری -->
+        <div class="stats-cards">
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="newOrdersCount">۰</div>
+                        <div class="stat-label">سفارشات جدید</div>
+                    </div>
+                    <div class="stat-icon primary pulse">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="preparingCount">۰</div>
+                        <div class="stat-label">در حال آماده‌سازی</div>
+                    </div>
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="readyCount">۰</div>
+                        <div class="stat-label">آماده تحویل</div>
+                    </div>
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="todayOrdersCount">۰</div>
+                        <div class="stat-label">سفارشات امروز</div>
+                    </div>
+                    <div class="stat-icon danger">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- جدول سفارشات -->
+        <div class="orders-section fade-in">
+            <div class="section-header">
+                <h2 class="section-title">سفارشات اخیر</h2>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">همه</button>
+                    <button class="filter-btn" data-filter="pending">در انتظار تایید</button>
+                    <button class="filter-btn" data-filter="confirmed">تایید شده</button>
+                    <button class="filter-btn" data-filter="ready">آماده شده</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>شناسه سفارش</th>
+                            <th>مشتری</th>
+                            <th>میز</th>
+                            <th>محصولات</th>
+                            <th>مبلغ</th>
+                            <th>وضعیت</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- ردیف‌های سفارش با JavaScript پر می‌شوند -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- جزئیات سفارش -->
+        <div class="order-details fade-in" id="orderDetails" style="display: none;">
+            <div class="details-header">
+                <h2 class="details-title">جزئیات سفارش <span id="detailOrderId"></span></h2>
+                <button class="btn btn-primary" onclick="closeOrderDetails()">
+                    <i class="fas fa-times"></i>
+                    بستن
+                </button>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">مشتری</span>
+                    <span class="detail-value" id="detailCustomer"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">شماره میز</span>
+                    <span class="detail-value" id="detailTable"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">زمان سفارش</span>
+                    <span class="detail-value" id="detailTime"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">وضعیت</span>
+                    <span class="detail-value" id="detailStatus"></span>
+                </div>
+            </div>
+            
+            <div class="order-items-details">
+                <h3 style="margin-bottom: 1rem;">محصولات سفارش</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>نام محصول</th>
+                            <th>تعداد</th>
+                            <th>قیمت واحد</th>
+                            <th>جمع</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailItems">
+                        <!-- آیتم‌های سفارش با JavaScript پر می‌شوند -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="3">مجموع کل</td>
+                            <td id="detailTotal">۰ تومان</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="actions-footer">
+                <button class="btn btn-danger" onclick="rejectOrder()">
+                    <i class="fas fa-times"></i>
+                    رد سفارش
+                </button>
+                <button class="btn btn-success" onclick="confirmOrder()">
+                    <i class="fas fa-check"></i>
+                    تایید سفارش
+                </button>
+                <button class="btn btn-warning" onclick="markAsPreparing()">
+                    <i class="fas fa-utensils"></i>
+                    در حال آماده‌سازی
+                </button>
+                <button class="btn btn-primary" onclick="markAsReady()">
+                    <i class="fas fa-check-double"></i>
+                    آماده تحویل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // المنت‌های DOM
+        const ordersTableBody = document.getElementById('ordersTableBody');
+        const orderDetails = document.getElementById('orderDetails');
+        const detailOrderId = document.getElementById('detailOrderId');
+        const detailCustomer = document.getElementById('detailCustomer');
+        const detailTable = document.getElementById('detailTable');
+        const detailTime = document.getElementById('detailTime');
+        const detailStatus = document.getElementById('detailStatus');
+        const detailItems = document.getElementById('detailItems');
+        const detailTotal = document.getElementById('detailTotal');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const newOrdersCount = document.getElementById('newOrdersCount');
+        const preparingCount = document.getElementById('preparingCount');
+        const readyCount = document.getElementById('readyCount');
+        const todayOrdersCount = document.getElementById('todayOrdersCount');
+
+        let currentFilter = 'all';
+        let orders = [];
+        let currentOrder = null;
+
+        // دریافت سفارشات از API
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/api/manager/orders/');
+                const data = await response.json();
+                orders = data.orders;
+                renderOrders();
+                updateStats();
+            } catch (error) {
+                console.error('خطا در دریافت سفارشات:', error);
+                alert('دریافت سفارشات با مشکل مواجه شد.');
+            }
+        }
+
+        // به‌روزرسانی آمار
+        function updateStats() {
+            newOrdersCount.textContent = orders.filter(order => order.status === 'pending').length;
+            preparingCount.textContent = orders.filter(order => order.status === 'preparing').length;
+            readyCount.textContent = orders.filter(order => order.status === 'ready').length;
+            todayOrdersCount.textContent = orders.length;  // می‌توانید منطق امروز رو اضافه کنید
+        }
+
+        // نمایش سفارشات در جدول
+        function renderOrders() {
+            ordersTableBody.innerHTML = '';
+            
+            const filteredOrders = currentFilter === 'all' 
+                ? orders 
+                : orders.filter(order => order.status === currentFilter);
+            
+            filteredOrders.forEach(order => {
+                const row = document.createElement('tr');
+                
+                // تعیین وضعیت
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(order.status) {
+                    case 'pending':
+                        statusText = 'در انتظار تایید';
+                        statusClass = 'status-pending';
+                        break;
+                    case 'confirmed':
+                        statusText = 'تایید شده';
+                        statusClass = 'status-confirmed';
+                        break;
+                    case 'preparing':
+                        statusText = 'در حال آماده‌سازی';
+                        statusClass = 'status-preparing';
+                        break;
+                    case 'ready':
+                        statusText = 'آماده تحویل';
+                        statusClass = 'status-ready';
+                        break;
+                    case 'delivered':
+                        statusText = 'تکمیل شده';
+                        statusClass = 'status-completed';
+                        break;
+                }
+                
+                row.innerHTML = `
+                    <td class="order-id">${order.id}</td>
+                    <td>
+                        <div class="customer-info">
+                            <span class="customer-name">${order.customer}</span>
+                        </div>
+                    </td>
+                    <td>${order.table}</td>
+                    <td class="order-items">
+                        <div class="item-list">
+                            ${order.items.map(item => `
+                                <li>
+                                    <span class="item-name">${item.name}</span>
+                                    <span class="item-quantity">${item.quantity}x</span>
+                                </li>
+                            `).join('')}
+                        </div>
+                    </td>
+                    <td>${order.total.toLocaleString()} تومان</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-sm" onclick="viewOrderDetails('${order.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${order.status === 'pending' ? `
+                                <button class="btn btn-success btn-sm" onclick="confirmOrderFromTable('${order.id}')">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                
+                ordersTableBody.appendChild(row);
+            });
+        }
+
+        // مشاهده جزئیات سفارش
+        function viewOrderDetails(orderId) {
+            currentOrder = orders.find(order => order.id === orderId);
+            
+            if (!currentOrder) return;
+            
+            // پر کردن اطلاعات جزئیات
+            detailOrderId.textContent = currentOrder.id;
+            detailCustomer.textContent = currentOrder.customer;
+            detailTable.textContent = currentOrder.table;
+            detailTime.textContent = currentOrder.time;
+            detailTotal.textContent = currentOrder.total.toLocaleString() + ' تومان';
+            
+            // تعیین وضعیت
+            let statusText = '';
+            switch(currentOrder.status) {
+                case 'pending':
+                    statusText = 'در انتظار تایید';
+                    break;
+                case 'confirmed':
+                    statusText = 'تایید شده';
+                    break;
+                case 'preparing':
+                    statusText = 'در حال آماده‌سازی';
+                    break;
+                case 'ready':
+                    statusText = 'آماده تحویل';
+                    break;
+                case 'delivered':
+                    statusText = 'تکمیل شده';
+                    break;
+            }
+            detailStatus.textContent = statusText;
+            
+            // پر کردن آیتم‌های سفارش
+            detailItems.innerHTML = '';
+            currentOrder.items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price.toLocaleString()} تومان</td>
+                    <td>${(item.price * item.quantity).toLocaleString()} تومان</td>
+                `;
+                detailItems.appendChild(row);
+            });
+            
+            // نمایش بخش جزئیات
+            orderDetails.style.display = 'block';
+            orderDetails.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // بستن جزئیات سفارش
+        function closeOrderDetails() {
+            orderDetails.style.display = 'none';
+            currentOrder = null;
+        }
+
+        // تایید سفارش از جدول (ارسال به API)
+        async function confirmOrderFromTable(orderId) {
+            try {
+                const response = await fetch(`/api/manager/confirm/${orderId.replace('ORD-', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    await fetchOrders();
+                    alert(`سفارش ${orderId} با موفقیت تایید شد.`);
+                } else {
+                    alert('عملیات ناموفق بود.');
+                }
+            } catch (error) {
+                console.error('خطا:', error);
+                alert('ارتباط با سرور برقرار نشد.');
+            }
+        }
+
+        // تایید سفارش از جزئیات
+        async function confirmOrder() {
+            if (currentOrder) {
+                await confirmOrderFromTable(currentOrder.id);
+                closeOrderDetails();
+            }
+        }
+
+        // رد سفارش (ارسال به API)
+        async function rejectOrder() {
+            if (currentOrder && confirm(`آیا از رد کردن سفارش ${currentOrder.id} اطمینان دارید؟`)) {
+                try {
+                    const response = await fetch(`/api/manager/reject/${currentOrder.id.replace('ORD-', '')}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        await fetchOrders();
+                        closeOrderDetails();
+                        alert(`سفارش ${currentOrder.id} رد شد.`);
+                    } else {
+                        alert('عملیات ناموفق بود.');
+                    }
+                } catch (error) {
+                    console.error('خطا:', error);
+                    alert('ارتباط با سرور برقرار نشد.');
+                }
+            }
+        }
+
+        // علامت‌گذاری به عنوان در حال آماده‌سازی
+        async function markAsPreparing() {
+            if (currentOrder) {
+                // اگر نیاز به API جدا دارید، اضافه کنید. فعلاً فرض کنیم از تایید استفاده می‌شود
+                currentOrder.status = 'preparing';  // محلی
+                await fetchOrders();
+                closeOrderDetails();
+                alert(`سفارش ${currentOrder.id} در حال آماده‌سازی است.`);
+            }
+        }
+
+        // علامت‌گذاری به عنوان آماده تحویل
+        async function markAsReady() {
+            if (currentOrder) {
+                // اگر نیاز به API جدا دارید، اضافه کنید
+                currentOrder.status = 'ready';  // محلی
+                await fetchOrders();
+                closeOrderDetails();
+                alert(`سفارش ${currentOrder.id} آماده تحویل است.`);
+            }
+        }
+
+        // دریافت CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // بارگذاری اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchOrders();
+            
+            // اضافه کردن event listener برای فیلترها
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderOrders();
+                });
+            });
+            
+            // بروزرسانی خودکار هر 30 ثانیه
+            setInterval(fetchOrders, 30000);
+        });
+    </script>
 </body>
 </html>

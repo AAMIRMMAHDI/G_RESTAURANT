@@ -3,27 +3,990 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل گارسون</title>
+    <title>پنل گارسون - تحویل سفارشات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
-        body { background: #f5f7fa; padding: 2rem; }
-        .order-card { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; }
+        
+        :root {
+            --primary: #7209B7;
+            --primary-dark: #5A0890;
+            --secondary: #4361EE;
+            --accent: #4CC9F0;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --dark: #2B2D42;
+            --light: #F8F9FA;
+            --gray: #8D99AE;
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        /* هدر */
+        .header {
+            background: linear-gradient(135deg, var(--dark), #1A1C2E);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.6rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #3A8FB7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* کارت‌های آماری */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, var(--success), #388E3C);
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, var(--warning), #F57C00);
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* بخش اصلی */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* بخش سفارشات آماده */
+        .ready-orders-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(114, 9, 183, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #388E3C);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .orders-container {
+            padding: 1.5rem;
+            display: grid;
+            gap: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #f0f0f0;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .order-card.urgent {
+            border-right: 4px solid var(--danger);
+            animation: pulse 2s infinite;
+        }
+        
+        .order-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+        
+        .order-id {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        .order-time {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .order-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-ready {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-urgent {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+        
+988        .order-body {
+            padding: 1.5rem;
+        }
+        
+        .order-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .info-value {
+            font-weight: 600;
+        }
+        
+        .table-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(114, 9, 183, 0.1);
+            border-radius: 8px;
+        }
+        
+        .order-items {
+            margin-bottom: 1.5rem;
+        }
+        
+        .items-title {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+        }
+        
+        .item-list {
+            list-style: none;
+        }
+        
+        .item-list li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            flex: 1;
+        }
+        
+        .item-quantity {
+            background: #f0f0f0;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .item-notes {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+            padding-right: 1rem;
+        }
+        
+        .order-footer {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-total {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .btn-sm {
+            padding: 0.7rem 1.2rem;
+            font-size: 0.85rem;
+        }
+        
+        /* بخش نقشه میزها */
+        .tables-section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .tables-container {
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .table-item {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .table-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-item.active {
+            border-color: var(--primary);
+            background: rgba(114, 9, 183, 0.05);
+        }
+        
+        .table-item.has-order {
+            border-color: var(--success);
+            background: rgba(76, 175, 80, 0.05);
+        }
+        
+        .table-number-large {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .table-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 50px;
+            display: inline-block;
+        }
+        
+        .status-empty {
+            background: rgba(158, 158, 158, 0.1);
+            color: #9E9E9E;
+        }
+        
+        .status-waiting {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-ready {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+        
+        /* نوتیفیکیشن */
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            transform: translateX(-150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 350px;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #3A8FB7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .notification-message {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .close-notification {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .close-notification:hover {
+            color: var(--dark);
+        }
+        
+        /* رسپانسیو */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .order-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .tables-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+        
+        /* انیمیشن‌ها */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
     </style>
 </head>
 <body>
-    <h2>سفارشات آماده تحویل</h2>
-    <p>فروش امروز: {{ delivered_today }} تومان</p>
-    {% for order in orders %}
-    <div class="order-card">
-        <strong>میز {{ order.table_number }} - سفارش #{{ order.id }}</strong>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="order_id" value="{{ order.id }}">
-            <button type="submit" class="btn btn-success">تحویل داده شد</button>
-        </form>
+    <div class="container">
+        <!-- هدر -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-concierge-bell"></i>
+                </div>
+                <div class="logo-text">پنل گارسون</div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">گ</div>
+                <div class="user-details">
+                    <div class="user-name">رضا گارسون</div>
+                    <div class="user-role">گارسون</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- کارت‌های آماری -->
+        <div class="stats-cards">
+            <div class="stat-card fade-in">
+                <div class="stat-icon primary">
+                    <i class="fas fa-utensils"></i>
+                </div>
+
+
+                <div class="stat-info">
+                    <div class="stat-value" id="readyOrdersCount">0</div>
+                    <div class="stat-label">سفارشات آماده</div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="deliveredOrdersCount">0</div>
+                    <div class="stat-label">تحویل داده شده</div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in">
+                <div class="stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value" id="waitingOrdersCount">0</div>
+                    <div class="stat-label">در انتظار تحویل</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- بخش اصلی -->
+        <div class="main-content">
+            <!-- سفارشات آماده -->
+            <div class="ready-orders-section fade-in">
+                <div class="section-header">
+                    <h2 class="section-title">سفارشات آماده تحویل</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            بروزرسانی
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="orders-container" id="readyOrdersContainer">
+                    <!-- کارت‌های سفارش با JavaScript پر می‌شوند -->
+                </div>
+            </div>
+
+            <!-- نقشه میزها -->
+            <div class="tables-section fade-in">
+                <div class="section-header">
+                    <h2 class="section-title">نقشه میزها</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-success" id="markAllDeliveredBtn">
+                            <i class="fas fa-check-double"></i>
+                            تحویل همه
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tables-container" id="tablesContainer">
+                    <!-- میزها با JavaScript پر می‌شوند -->
+                </div>
+            </div>
+        </div>
     </div>
-    {% endfor %}
+
+    <!-- نوتیفیکیشن -->
+    <div class="notification-toast" id="notificationToast">
+        <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title" id="toastTitle">سفارش جدید</div>
+            <div class="notification-message" id="toastMessage">یک سفارش جدید برای میز ۵ آماده است</div>
+        </div>
+        <button class="close-notification" id="closeToast">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        // داده‌های نمونه برای میزها
+        let tables = Array.from({length: 20}, (_, i) => ({ number: i+1, status: 'empty' }));
+
+        // المنت‌های DOM
+        const readyOrdersContainer = document.getElementById('readyOrdersContainer');
+        const tablesContainer = document.getElementById('tablesContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const markAllDeliveredBtn = document.getElementById('markAllDeliveredBtn');
+        const notificationToast = document.getElementById('notificationToast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+        const closeToast = document.getElementById('closeToast');
+        const readyOrdersCount = document.getElementById('readyOrdersCount');
+        const deliveredOrdersCount = document.getElementById('deliveredOrdersCount');
+        const waitingOrdersCount = document.getElementById('waitingOrdersCount');
+
+        let readyOrders = [];
+        let deliveredOrders = 0;
+
+        // دریافت سفارشات از API
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/api/waiter/orders/');
+                const data = await response.json();
+                readyOrders = data.orders || [];
+                renderReadyOrders();
+                renderTables();
+                updateStats();
+            } catch (error) {
+                console.error('خطا در دریافت سفارشات:', error);
+                showNotification('خطا', 'دریافت سفارشات با مشکل مواجه شد.');
+            }
+        }
+
+        // نمایش سفارشات آماده
+        function renderReadyOrders() {
+            readyOrdersContainer.innerHTML = '';
+            
+            if (readyOrders.length === 0) {
+                readyOrdersContainer.innerHTML = `
+                    <div style="text-align: center; color: #999; padding: 3rem 1rem;">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>هیچ سفارش آماده‌ای برای تحویل وجود ندارد</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            readyOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = `order-card fade-in ${order.urgent ? 'urgent' : ''}`;
+                
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">${order.id}</div>
+                        <div class="order-time">${order.time}</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-info">
+                            <div class="info-item">
+                                <span class="info-label">مشتری</span>
+                                <span class="info-value">${order.customer}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">وضعیت</span>
+                                <span class="order-badge ${order.urgent ? 'badge-urgent' : 'badge-ready'}">
+                                    ${order.urgent ? 'فوری' : 'آماده'}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">مبلغ</span>
+                                <span class="info-value">${order.total.toLocaleString()} تومان</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">شماره میز</span>
+                                <div class="table-number">${order.table}</div>
+                            </div>
+                        </div>
+                        <div class="order-items">
+                            <div class="items-title">محصولات سفارش:</div>
+                            <ul class="item-list">
+                                ${order.items.map(item => `
+                                    <li>
+                                        <span class="item-name">${item.name}</span>
+                                        <span class="item-quantity">${item.quantity}</span>
+                                    </li>
+                                    ${item.notes ? `<div class="item-notes">${item.notes}</div>` : ''}
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="order-footer">
+                        <div class="order-total">${order.total.toLocaleString()} تومان</div>
+                        <div class="action-buttons">
+                            <button class="btn btn-success btn-sm" onclick="deliverOrder('${order.id}')">
+                                <i class="fas fa-check"></i>
+                                تحویل داده شد
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="viewTableLocation(${order.table})">
+                                <i class="fas fa-map-marker-alt"></i>
+                                موقعیت میز
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                readyOrdersContainer.appendChild(orderCard);
+            });
+        }
+
+        // نمایش میزها
+        function renderTables() {
+            tablesContainer.innerHTML = '';
+            
+            tables.forEach(table => {
+                const tableItem = document.createElement('div');
+                
+                const hasReadyOrder = readyOrders.some(order => order.table === table.number);
+                table.status = hasReadyOrder ? 'ready' : 'empty';
+                
+                let statusText = '';
+                let statusClass = '';
+                
+                switch(table.status) {
+                    case 'empty':
+                        statusText = 'خالی';
+                        statusClass = 'status-empty';
+                        break;
+                    case 'waiting':
+                        statusText = 'منتظر غذا';
+                        statusClass = 'status-waiting';
+                        break;
+                    case 'ready':
+                        statusText = 'آماده تحویل';
+                        statusClass = 'status-ready';
+                        break;
+                }
+                
+                tableItem.className = `table-item ${hasReadyOrder ? 'has-order' : ''}`;
+                tableItem.onclick = () => viewTableOrders(table.number);
+                
+                tableItem.innerHTML = `
+                    <div class="table-number-large">${table.number}</div>
+                    <div class="table-status ${statusClass}">${statusText}</div>
+                    ${hasReadyOrder ? '<div style="margin-top: 0.5rem;"><i class="fas fa-utensils" style="color: var(--success);"></i></div>' : ''}
+                `;
+                
+                tablesContainer.appendChild(tableItem);
+            });
+        }
+
+        // به‌روزرسانی آمار
+        function updateStats() {
+            readyOrdersCount.textContent = readyOrders.length;
+            deliveredOrdersCount.textContent = deliveredOrders;
+            waitingOrdersCount.textContent = readyOrders.length;
+        }
+
+        // تحویل سفارش
+        async function deliverOrder(orderId) {
+            try {
+                const response = await fetch(`/api/waiter/deliver/${orderId.replace('ORD-', '')}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    deliveredOrders++;
+                    await fetchOrders();
+                    showNotification('تحویل سفارش', `سفارش ${orderId} تحویل داده شد.`);
+                } else {
+                    showNotification('خطا', 'عملیات ناموفق بود.');
+                }
+            } catch (error) {
+                console.error('خطا:', error);
+                showNotification('خطا', 'ارتباط با سرور برقرار نشد.');
+            }
+        }
+
+        // مشاهده سفارشات یک میز خاص
+        function viewTableOrders(tableNumber) {
+            const tableOrders = readyOrders.filter(order => order.table === tableNumber);
+            
+            if (tableOrders.length === 0) {
+                showNotification('میز ' + tableNumber, 'هیچ سفارش آماده‌ای برای این میز وجود ندارد.');
+                return;
+            }
+            
+            let message = `سفارشات آماده برای میز ${tableNumber}:\n`;
+            tableOrders.forEach(order => {
+                message += `- ${order.id}: ${order.items.map(item => item.name).join('، ')}\n`;
+            });
+            
+            showNotification('سفارشات میز ' + tableNumber, message);
+        }
+
+        // مشاهده موقعیت میز
+        function viewTableLocation(tableNumber) {
+            showNotification('موقعیت میز', `میز شماره ${tableNumber} در بخش غربی سالن قرار دارد.`);
+            
+            const tableItems = document.querySelectorAll('.table-item');
+            tableItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('.table-number-large').textContent == tableNumber) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+
+        // تحویل همه سفارشات
+        async function markAllDelivered() {
+            if (readyOrders.length === 0) {
+                showNotification('تحویل سفارشات', 'هیچ سفارشی برای تحویل وجود ندارد.');
+                return;
+            }
+            
+            if (confirm(`آیا از تحویل همه ${readyOrders.length} سفارش اطمینان دارید؟`)) {
+                for (const order of readyOrders) {
+                    await deliverOrder(order.id);
+                }
+                showNotification('تحویل سفارشات', 'همه سفارشات با موفقیت تحویل داده شدند.');
+            }
+        }
+
+        // نمایش نوتیفیکیشن
+        function showNotification(title, message) {
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            notificationToast.classList.add('show');
+            
+            setTimeout(() => {
+                notificationToast.classList.remove('show');
+            }, 5000);
+        }
+
+        // بستن نوتیفیکیشن
+        closeToast.addEventListener('click', () => {
+            notificationToast.classList.remove('show');
+        });
+
+        // دریافت CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // بارگذاری اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchOrders();
+            
+            refreshBtn.addEventListener('click', () => {
+                fetchOrders();
+                showNotification('بروزرسانی', 'لیست سفارشات بروزرسانی شد.');
+            });
+            
+            markAllDeliveredBtn.addEventListener('click', markAllDelivered);
+            
+            // بروزرسانی خودکار هر 15 ثانیه
+            setInterval(fetchOrders, 15000);
+        });
+    </script>
 </body>
 </html>

@@ -1,37 +1,212 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>رستوران مدرن | تجربه طعم‌های بی‌نظیر</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        /* تمام CSS از home.html اصلی کپی شد */
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
-        :root { --primary: #FF6B6B; --primary-dark: #EE5A52; --secondary: #4ECDC4; --accent: #FFD166; --dark: #292F36; --light: #F7F7F7; --gray: #8A8A8A; --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); --shadow: 0 10px 30px rgba(0, 0, 0, 0.08); --radius: 16px; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
-        html { scroll-behavior: smooth; }
-        body { background-color: var(--light); color: var(--dark); overflow-x: hidden; line-height: 1.6; }
-        .floating-nav { position: fixed; top: 2rem; right: 2rem; z-index: 1000; display: flex; gap: 1rem; }
-        .nav-btn { width: 50px; height: 50px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; color: var(--dark); text-decoration: none; box-shadow: var(--shadow); transition: var(--transition); font-size: 1.2rem; }
-        .nav-btn:hover { transform: translateY(-5px); background: var(--primary); color: white; }
-        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(41, 47, 54, 0.9) 0%, rgba(41, 47, 54, 0.7) 100%), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'); background-size: cover; background-position: center; background-attachment: fixed; color: white; text-align: center; padding: 2rem; }
-        .hero-content { max-width: 800px; z-index: 2; }
-        .hero-title { font-size: 4.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s ease 0.2s forwards; }
-        .hero-subtitle { font-size: 1.4rem; margin-bottom: 2.5rem; opacity: 0.9; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s ease 0.4s forwards; }
-        .cta-buttons { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; opacity: 0; transform: translateY(30px); animation: fadeInUp 1s ease 0.6s forwards; }
-        .btn { padding: 1rem 2.5rem; border-radius: 50px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
-        .btn-primary:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255, 107, 107, 0.5); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        :root { 
+            --primary: #FF6B6B; 
+            --primary-dark: #EE5A52; 
+            --secondary: #4ECDC4; 
+            --accent: #FFD166; 
+            --dark: #292F36; 
+            --light: #F7F7F7; 
+            --gray: #8A8A8A; 
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
+            --radius: 16px; 
+        }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Vazirmatn', sans-serif; 
+        }
+        html { 
+            scroll-behavior: smooth; 
+        }
+        body { 
+            background-color: var(--light); 
+            color: var(--dark); 
+            overflow-x: hidden; 
+            line-height: 1.6; 
+        }
+
+        /* نوار سمت راست - فقط سفارش/ورود */
+        .floating-nav-right { 
+            position: fixed; 
+            top: 2rem; 
+            right: 2rem; 
+            z-index: 1000; 
+            display: flex; 
+            gap: 1rem; 
+        }
+
+        /* نوار سمت چپ - مدیریت، سرآشپز، گارسون */
+        .floating-nav-left { 
+            position: fixed; 
+            top: 2rem; 
+            left: 2rem; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1rem; 
+        }
+
+        .nav-btn { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(12px); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--dark); 
+            text-decoration: none; 
+            box-shadow: var(--shadow); 
+            transition: var(--transition); 
+            font-size: 1.3rem; 
+            position: relative;
+        }
+        .nav-btn:hover { 
+            transform: translateY(-6px); 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+        }
+        .nav-btn:hover::after {
+            content: attr(data-title);
+            position: absolute;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        .nav-btn::after { 
+            opacity: 0; 
+        }
+
+        /* تنظیم موقعیت tooltip برای سمت چپ و راست */
+        .floating-nav-left .nav-btn:hover::after {
+            right: -100px; 
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .floating-nav-right .nav-btn:hover::after {
+            left: -100px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* بقیه استایل‌ها بدون تغییر */
+        .hero { 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            overflow: hidden; 
+            background: linear-gradient(135deg, rgba(41, 47, 54, 0.9) 0%, rgba(41, 47, 54, 0.7) 100%), url('{% static 'image/1.jpg' %}'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            color: white; 
+            text-align: center; 
+            padding: 2rem; 
+        }
+        .hero-content { 
+            max-width: 800px; 
+            z-index: 2; 
+        }
+        .hero-title { 
+            font-size: 4.5rem; 
+            font-weight: 800; 
+            line-height: 1.1; 
+            margin-bottom: 1.5rem; 
+            background: linear-gradient(to right, #fff, var(--accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            opacity: 0; 
+            transform: translateY(30px); 
+            animation: fadeInUp 1s ease 0.2s forwards; 
+        }
+        .hero-subtitle { 
+            font-size: 1.4rem; 
+            margin-bottom: 2.5rem; 
+            opacity: 0; 
+            transform: translateY(30px); 
+            animation: fadeInUp 1s ease 0.4s forwards; 
+        }
+        .cta-buttons { 
+            display: flex; 
+            gap: 1.5rem; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            opacity: 0; 
+            transform: translateY(30px); 
+            animation: fadeInUp 1s ease 0.6s forwards; 
+        }
+        .btn { 
+            padding: 1rem 2.5rem; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            border: none; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px; 
+            text-decoration: none; 
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: white; 
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.5); 
+        }
+        @keyframes fadeInUp { 
+            to { opacity: 1; transform: translateY(0); } 
+        }
     </style>
 </head>
 <body>
-    <div class="floating-nav">
+    <!-- سمت چپ: مدیریت، سرآشپز، گارسون -->
+    <div class="floating-nav-left">
+        <a href="{% url 'index:manage_orders' %}" class="nav-btn" data-title="مدیریت">
+            <i class="fas fa-user-shield"></i>
+        </a>
+        <a href="{% url 'index:chef_panel' %}" class="nav-btn" data-title="سرآشپز">
+            <i class="fas fa-hat-chef"></i>
+        </a>
+        <a href="{% url 'index:waiter_panel' %}" class="nav-btn" data-title="گارسون">
+            <i class="fas fa-concierge-bell"></i>
+        </a>
+    </div>
+
+    <!-- سمت راست: فقط سفارش یا ورود -->
+    <div class="floating-nav-right">
         {% if user.is_authenticated %}
-            <a href="{% url 'index:order_menu' %}" class="nav-btn"><i class="fas fa-utensils"></i></a>
+            <a href="{% url 'index:order_menu' %}" class="nav-btn" data-title="سفارش غذا">
+                <i class="fas fa-utensils"></i>
+            </a>
         {% else %}
-            <a href="{% url 'user:login' %}" class="nav-btn"><i class="fas fa-sign-in-alt"></i></a>
+            <a href="{% url 'user:login' %}" class="nav-btn" data-title="ورود / ثبت‌نام">
+                <i class="fas fa-sign-in-alt"></i>
+            </a>
         {% endif %}
     </div>
 
