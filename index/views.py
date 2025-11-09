@@ -203,6 +203,14 @@ def get_chef_orders(request):
             'notes': ''  # اگر یادداشتی دارید اضافه کنید
         } for item in order.items.all()]
         
+        cooking_time = order.calculate_cooking_time()  # زمان کل پخت
+        
+        # اگر در حال پخت است، زمان باقی‌مانده را محاسبه کن (برای استفاده در JS سمت کلاینت)
+        remaining_time = None
+        if order.status == 'preparing' and order.cooking_start_time:
+            elapsed = (timezone.now() - order.cooking_start_time).total_seconds() / 60
+            remaining_time = max(0, cooking_time - elapsed)
+        
         orders_data.append({
             'id': f"ORD-{order.id:03d}",
             'customer': customer_name,
@@ -211,6 +219,9 @@ def get_chef_orders(request):
             'total': int(order.total_price),
             'status': 'pending' if order.status == 'confirmed' else order.status,
             'time': order.created_at.strftime('%H:%M'),
+            'cooking_time': cooking_time,  # زمان کل برای تایمر در JS
+            'remaining_time': remaining_time,  # اگر در حال پخت، زمان باقی‌مانده اولیه
+            'cooking_start_time': order.cooking_start_time.isoformat() if order.cooking_start_time else None,
             'urgent': False  # می‌توانید منطق فوری اضافه کنید
         })
     
@@ -224,8 +235,9 @@ def start_cooking(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if order.status == 'confirmed':
         order.status = 'preparing'
+        order.cooking_start_time = timezone.now()
         order.save()
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'success', 'cooking_time': order.calculate_cooking_time()})
     return JsonResponse({'status': 'error'}, status=400)
 
 

@@ -22,6 +22,7 @@ class MenuItem(models.Model):
     image = models.ImageField(upload_to='menu/', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='items')
     description = models.TextField(blank=True)
+    cooking_time = models.PositiveIntegerField(default=0, help_text="زمان پخت به دقیقه")
     is_available = models.BooleanField(default=True)
 
     def __str__(self):
@@ -47,6 +48,7 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    cooking_start_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"سفارش {self.id} - میز {self.table_number}"
@@ -55,6 +57,11 @@ class Order(models.Model):
         total = sum(item.quantity * item.price_at_order for item in self.items.all())
         self.total_price = total
         self.save(update_fields=['total_price'])
+
+    def calculate_cooking_time(self):
+        # زمان کل = مجموع زمان پخت آیتم‌های منحصر به فرد (بدون ضرب در quantity، چون همزمان پخته می‌شوند)
+        unique_items = set(item.menu_item for item in self.items.all())
+        return sum(item.cooking_time for item in unique_items)
 
     class Meta:
         ordering = ['-created_at']

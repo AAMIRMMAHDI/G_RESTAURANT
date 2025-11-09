@@ -39,9 +39,19 @@
         .action-buttons { display: flex; gap: 0.5rem; }
         .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
         .form-section { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem; position: sticky; top: 2rem; }
-        .form-control, .form-select { width: 100%; padding: 0.9rem 1rem; border: 1px solid #e0e0e0; border-radius: 8px; }
+        .form-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--dark); }
+        .form-control, .form-select { width: 100%; padding: 0.9rem 1rem; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); outline: none; }
+        .form-textarea { min-height: 100px; resize: vertical; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: var(--transition); }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(67,97,238,0.3); }
+        .tabs { display: flex; border-bottom: 1px solid #eee; margin-bottom: 1rem; }
+        .tab-btn { padding: 1rem 2rem; background: none; border: none; cursor: pointer; font-weight: 600; position: relative; transition: color 0.3s; }
+        .tab-btn.active { color: var(--primary); }
+        .tab-btn.active:after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--primary); }
     </style>
 </head>
 <body>
@@ -71,16 +81,20 @@
             <div class="left-column">
                 <div class="users-section">
                     <div class="section-header">
-                        <h2 class="section-title">لیست کارکنان</h2>
+                        <h2 class="section-title">لیست کاربران</h2>
                         <button class="btn btn-primary" onclick="location.reload()">بروزرسانی</button>
+                    </div>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="staff">کارکنان رستوران</button>
+                        <button class="tab-btn" data-tab="customers">مشتریان</button>
                     </div>
                     <table class="users-table">
                         <thead>
-                            <tr><th>کارمند</th><th>موبایل</th><th>سمت</th><th>وضعیت</th><th>عملیات</th></tr>
+                            <tr><th>کاربر</th><th>موبایل</th><th>سمت</th><th>وضعیت</th><th>عملیات</th></tr>
                         </thead>
                         <tbody>
                             {% for user in users %}
-                            <tr>
+                            <tr data-tab="{% if user.role == 'customer' %}customers{% else %}staff{% endif %}">
                                 <td>
                                     <div class="user-info-cell">
                                         <div class="user-avatar-small" style="background:#4361EE">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</div>
@@ -113,10 +127,61 @@
             </div>
 
             <div class="form-section">
-                <h2 class="form-title">افزودن/ویرایش کارمند</h2>
+                <h2 class="form-title">افزودن/ویرایش کاربر</h2>
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.first_name.id_for_label }}">نام</label>
+                        <input type="text" class="form-control" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}" value="{{ form.first_name.value|default:'' }}" placeholder="نام">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.last_name.id_for_label }}">نام خانوادگی</label>
+                        <input type="text" class="form-control" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.name }}" value="{{ form.last_name.value|default:'' }}" placeholder="نام خانوادگی">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.national_code.id_for_label }}">کد ملی</label>
+                        <input type="text" class="form-control" id="{{ form.national_code.id_for_label }}" name="{{ form.national_code.name }}" value="{{ form.national_code.value|default:'' }}" placeholder="کد ملی">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.mobile.id_for_label }}">موبایل</label>
+                        <input type="text" class="form-control" id="{{ form.mobile.id_for_label }}" name="{{ form.mobile.name }}" value="{{ form.mobile.value|default:'' }}" placeholder="موبایل">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.email.id_for_label }}">ایمیل</label>
+                        <input type="email" class="form-control" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" value="{{ form.email.value|default:'' }}" placeholder="ایمیل">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.birth_date.id_for_label }}">تاریخ تولد</label>
+                            <input type="date" class="form-control" id="{{ form.birth_date.id_for_label }}" name="{{ form.birth_date.name }}" value="{{ form.birth_date.value|default:'' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.hire_date.id_for_label }}">تاریخ استخدام</label>
+                            <input type="date" class="form-control" id="{{ form.hire_date.id_for_label }}" name="{{ form.hire_date.name }}" value="{{ form.hire_date.value|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.role.id_for_label }}">نقش</label>
+                            <select class="form-select" id="{{ form.role.id_for_label }}" name="{{ form.role.name }}">
+                                {% for choice in form.role.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.role.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="{{ form.status.id_for_label }}">وضعیت</label>
+                            <select class="form-select" id="{{ form.status.id_for_label }}" name="{{ form.status.name }}">
+                                {% for choice in form.status.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if form.status.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.address.id_for_label }}">آدرس</label>
+                        <textarea class="form-control form-textarea" id="{{ form.address.id_for_label }}" name="{{ form.address.name }}" placeholder="آدرس">{{ form.address.value|default:'' }}</textarea>
+                    </div>
                     <button type="submit" class="submit-btn">
                         {% if form.instance.pk %}ویرایش{% else %}ذخیره{% endif %} اطلاعات
                     </button>
@@ -124,5 +189,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // مدیریت تب‌ها
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.users-table tbody tr').forEach(row => {
+                    row.style.display = (row.dataset.tab === tab) ? '' : 'none';
+                });
+            });
+        });
+
+        // نمایش اولیه کارکنان
+        document.querySelector('.tab-btn[data-tab="staff"]').click();
+    </script>
 </body>
 </html>

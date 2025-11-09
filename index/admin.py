@@ -11,10 +11,10 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'is_available')
+    list_display = ('name', 'category', 'price', 'cooking_time', 'is_available')
     list_filter = ('category', 'is_available')
     search_fields = ('name', 'description')
-    list_editable = ('price', 'is_available')
+    list_editable = ('price', 'cooking_time', 'is_available')
     autocomplete_fields = ('category',)
 
 

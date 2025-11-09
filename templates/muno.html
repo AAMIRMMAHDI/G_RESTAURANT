@@ -101,6 +101,7 @@
         <div class="header-container">
             <div class="logo">
                 <i class="fas fa-utensils logo-icon"></i>
+                <span>فود‌کورت</span>
             </div>
             <div class="cart-icon" id="cartToggle">
                 <i class="fas fa-shopping-bag"></i>
@@ -194,27 +195,48 @@
                     {{ form.table_number }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label">درخواست ویژه</label>
+                    <label class="form-label">درخواست ویژه (اختیاری)</label>
                     {{ form.special_requests }}
                 </div>
                 <button type="submit" class="submit-order">
-                    <i class="fas fa-check-circle"></i> تأیید و ارسال
+                    <i class="fas fa-check-circle"></i> تأیید و ارسال سفارش
                 </button>
             </form>
         </div>
     </section>
 
     <script>
-        // داده‌های منو (از Django)
+        // داده‌های منو از Django
         const menuItems = {{ menu_items_json|safe }};
 
-        // سبد خرید
+        // سبد خرید: اول از sessionStorage، بعد از session سرور
         let cart = JSON.parse(sessionStorage.getItem('django_cart') || '[]');
+
+        // اگر سرور سبدی داره، جایگزین کن (برای وقتی که کاربر قبلاً سفارش داده)
+        {% if request.session.cart %}
+            cart = {{ request.session.cart|safe }};
+            sessionStorage.setItem('django_cart', JSON.stringify(cart));
+        {% endif %}
+
+        const csrfToken = '{{ csrf_token }}';
+        const syncCartUrl = '{% url "index:sync_cart" %}';
 
         // المنت‌ها
         const cartCountEl = document.getElementById('cartCount');
         const cartItemsEl = document.getElementById('cartItems');
         const sidebarTotalEl = document.getElementById('sidebarTotal');
+
+        // همگام‌سازی با سرور
+        function syncCartToServer() {
+            fetch(syncCartUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ cart: cart })
+            });
+        }
 
         // به‌روزرسانی تعداد
         function updateCartCount() {
@@ -222,17 +244,18 @@
             cartCountEl.textContent = total;
         }
 
-        // ذخیره سبد
+        // ذخیره سبد (مرورگر + سرور)
         function saveCart() {
             sessionStorage.setItem('django_cart', JSON.stringify(cart));
             updateCartCount();
             renderCart();
+            syncCartToServer(); // مهم!
         }
 
         // افزودن به سبد
         function addToCart(id) {
             const qtyEl = document.getElementById(`qty-${id}`);
-            const qty = parseInt(qtyEl.textContent);
+            const qty = parseInt(qtyEl.textContent) || 0;
             if (qty === 0) return;
 
             const item = menuItems.find(i => i.id === id);
@@ -241,13 +264,7 @@
             if (existing) {
                 existing.quantity += qty;
             } else {
-                cart.push({ 
-                    id: item.id, 
-                    name: item.name, 
-                    price: item.price, 
-                    quantity: qty, 
-                    image: item.image 
-                });
+                cart.push({ id: item.id, name: item.name, price: item.price, quantity: qty, image: item.image });
             }
 
             qtyEl.textContent = '0';
@@ -275,9 +292,9 @@
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-price">${(item.price * item.quantity).toLocaleString()} تومان</div>
                         <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;">
-                            <button type="button" class="qty-btn minus" data-id="${item.id}" onclick="changeQty(${item.id}, -1)">-</button>
+                            <button type="button" class="qty-btn minus" onclick="changeQty(${item.id}, -1)">-</button>
                             <span class="qty-value">${item.quantity}</span>
-                            <button type="button" class="qty-btn plus" data-id="${item.id}" onclick="changeQty(${item.id}, 1)">+</button>
+                            <button type="button" class="qty-btn plus" onclick="changeQty(${item.id}, 1)">+</button>
                             <button type="button" class="remove-item" onclick="removeFromCart(${item.id})">حذف</button>
                         </div>
                     </div>
@@ -296,7 +313,6 @@
             else saveCart();
         };
 
-        // حذف
         window.removeFromCart = function(id) {
             cart = cart.filter(i => i.id !== id);
             saveCart();
@@ -319,40 +335,44 @@
             document.getElementById('closeCart').click();
         });
 
-        // ثبت سفارش
+        // ثبت سفارش نهایی
         document.getElementById('checkoutBtn').addEventListener('click', () => {
             if (cart.length === 0) {
-                alert('سبد خرید خالی است');
+                alert('سبد خرید خالی است!');
                 return;
             }
-            document.getElementById('closeCart').click();
-            document.getElementById('orderFormSection').style.display = 'block';
-            document.getElementById('orderFormSection').scrollIntoView({ behavior: 'smooth' });
-        });
 
-        // دکمه‌های + / -
-        document.querySelectorAll('.qty-btn.plus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.dataset.id;
-                const el = document.getElementById(`qty-${id}`);
-                el.textContent = (parseInt(el.textContent) || 0) + 1;
+            // آخرین بار sync کن
+            fetch(syncCartUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ cart: cart })
+            }).then(() => {
+                document.getElementById('closeCart').click();
+                document.getElementById('orderFormSection').style.display = 'block';
+                document.getElementById('orderFormSection').scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        document.querySelectorAll('.qty-btn.minus').forEach(btn => {
+        // دکمه‌های + / -
+        document.querySelectorAll('.qty-btn.plus, .qty-btn.minus').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id = btn.dataset.id;
+                const id = parseInt(btn.dataset.id);
                 const el = document.getElementById(`qty-${id}`);
-                const val = parseInt(el.textContent) || 0;
-                if (val > 0) el.textContent = val - 1;
+                let val = parseInt(el.textContent) || 0;
+                if (btn.classList.contains('plus')) val++;
+                else if (val > 0) val--;
+                el.textContent = val;
             });
         });
 
         // افزودن به سبد
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                addToCart(id);
+                addToCart(parseInt(btn.dataset.id));
             });
         });
 
@@ -373,7 +393,7 @@
             document.getElementById('menu').scrollIntoView({ behavior: 'smooth' });
         });
 
-        // اولیه
+        // راه‌اندازی اولیه
         updateCartCount();
         renderCart();
     </script>

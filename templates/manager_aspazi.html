@@ -470,6 +470,20 @@
             animation: pulse 2s infinite;
         }
         
+        .timer {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .timer.expired {
+            color: var(--danger);
+            animation: pulse 1s infinite;
+        }
+        
         /* نوتیفیکیشن */
         .notification-toast {
             position: fixed;
@@ -708,6 +722,7 @@
 
         let currentFilter = 'all';
         let orders = [];
+        let timers = {};  // برای مدیریت تایمرهای سفارشات
 
         // دریافت سفارشات از API
         async function fetchOrders() {
@@ -789,6 +804,15 @@
                                 <span class="info-label">مبلغ</span>
                                 <span class="info-value">${order.total.toLocaleString()} تومان</span>
                             </div>
+                            ${order.status === 'preparing' ? `
+                                <div class="info-item">
+                                    <span class="info-label">زمان باقی‌مانده</span>
+                                    <span class="timer" id="timer-${order.id}">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        محاسبه...
+                                    </span>
+                                </div>
+                            ` : ''}
                         </div>
                         <div class="order-items">
                             <div class="items-title">محصولات سفارش:</div>
@@ -829,7 +853,62 @@
                 `;
                 
                 ordersGrid.appendChild(orderCard);
+                
+                // اگر سفارش در حال پخت است، تایمر را راه‌اندازی کن
+                if (order.status === 'preparing') {
+                    startTimer(order.id, order.remaining_time || order.cooking_time, order.cooking_start_time);
+                }
             });
+        }
+
+        // مدیریت تایمر برای سفارش
+        function startTimer(orderId, remainingMinutes, startTime) {
+            const timerElement = document.getElementById(`timer-${orderId}`);
+            if (!timerElement) return;
+
+            let remainingSeconds = Math.max(0, remainingMinutes * 60);
+
+            // اگر remaining_time موجود نبود، از startTime محاسبه کن
+            if (!remainingSeconds && startTime) {
+                const start = new Date(startTime);
+                const now = new Date();
+                const elapsedSeconds = Math.floor((now - start) / 1000);
+                remainingSeconds = Math.max(0, (orders.find(o => o.id === orderId).cooking_time * 60) - elapsedSeconds);
+            }
+
+            // پاک کردن تایمر قبلی اگر وجود داشت
+            if (timers[orderId]) {
+                clearInterval(timers[orderId]);
+            }
+
+            // نمایش اولیه
+            updateTimerDisplay(timerElement, remainingSeconds);
+
+            // اگر زمان تمام شده، اخطار بده
+            if (remainingSeconds <= 0) {
+                timerElement.classList.add('expired');
+                showNotification('اخطار', `وقت پخت سفارش ${orderId} تمام شده! عجله کن.`);
+                return;
+            }
+
+            // شروع countdown
+            timers[orderId] = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay(timerElement, remainingSeconds);
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(timers[orderId]);
+                    timerElement.classList.add('expired');
+                    showNotification('اخطار', `وقت پخت سفارش ${orderId} تمام شده! عجله کن.`);
+                }
+            }, 1000);
+        }
+
+        // بروزرسانی نمایش تایمر
+        function updateTimerDisplay(element, seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            element.innerHTML = `<i class="fas fa-hourglass-half"></i> ${minutes}:${secs < 10 ? '0' : ''}${secs} دقیقه`;
         }
 
         // شروع پخت (ارسال به API)
